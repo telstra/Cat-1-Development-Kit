@@ -11,4 +11,6 @@ This is an Arduino library for the Telstra Cat 1 development kit.
 
 ## Examples
 
-The included examples read data from sensors on the Genunino 101. [See here for instructions for setting up your Genuino 101.](https://github.com/telstra/TIC2017/wiki/2.1-Setting-up-the-Genuino-101).
+The included examples read data from sensors on the Genunino 101. [See here for instructions for setting up your Genuino 101.](https://github.com/telstra/TIC2017/wiki/2.1-Setting-up-the-Genuino-101). 
+
+NOTE: there might be a few differences in the librarys mentioned in the docs vs the ones in this repo 
