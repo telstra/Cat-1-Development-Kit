@@ -7,14 +7,15 @@ ShieldInterface shieldif;
 IoTShield shield(&shieldif);
 Connection4G conn(true,&shieldif);
 
-#define DeviceName ""
+#define DeviceName "device1"
 
-const char host[] = "XXXXX.iot.telstra.com";
+const char host[] = "XXXXX.cumulocity.com";
 const char tenant[] = "XXXXX";
-const char username[] = "";
-const char password[] = "";
-const char appkey[] = ""; 
+const char username[] = "username from cumulocity";
+const char password[] = "password from cumulocity";
+const char appkey[] = "needs to be empty"; 
 const char apn[] = "telstra.m2m";
+char id[9];
 
 
 TelstraIoT iotPlatform(host, tenant, username, password, appkey, &conn, &shield);
@@ -22,6 +23,8 @@ TelstraIoT iotPlatform(host, tenant, username, password, appkey, &conn, &shield)
 void setup() {
   Serial.begin(115200);
   delay(5000);  
+
+  conn.activatePDP(apn, "", "");
   
   Serial.print(F("[START] Starting Registration Script using device name: "));
   Serial.println(DeviceName);
@@ -31,23 +34,21 @@ void setup() {
   Serial.println(F("[    ] ******* Waiting for shield *********"));
   shield.waitUntilShieldIsReady();
   Serial.println(F("[    ] ******* Shield ready *********"));
-
-  conn.activatePDP(apn, "", "");  
+  
   
   // Check if shield is connected to 4G network
   if(shield.isPDPContextActive()) {
         Serial.println(F("[ OK ] ******* Connected to network *********"));
         
-    	  // Open secure TCP connection to IoT Platform host
+        // Open secure TCP connection to IoT Platform host
         Serial.println("############################ OPENING TCP CONNECTION #########################");
         conn.openTCP(host,443);  
     
-     	  // Register device on IoT Platform
+        // Register device on IoT Platform
         Serial.println("############################ REGISTERING DEVICE #############################");
-        char id[9];
+        
         const char* supportedMeasurements[1];
         supportedMeasurements[0] = "LightMeasurement";
-        //supportedMeasurements[0] = "Temperature";
     
         int result = iotPlatform.registerDevice(DeviceName, id, 9, supportedMeasurements, 1);
     
@@ -55,20 +56,10 @@ void setup() {
           Serial.println(F("[FAIL] Registration error. Please retry."));
           while(true);
         } else {
-    	    Serial.print(F("[    ] Arduino registered with id: "));
+          Serial.print(F("[    ] Arduino registered with id: "));
           Serial.println(id);
-    	  }
-      
-      	// Close the TCP connection to the server
-        Serial.println("############################ REGISTRATION COMPLETE #########################");
-        Serial.println("Please wait while connection closes...");
-      	conn.closeTCP();
-        Serial.println("Done!");
-        delay(1000);
-
-
-        
-	
+        }        
+  
   } else {
         Serial.println(F("[FAIL] Shield is not connected to 4G network!"));
         while(true);
@@ -80,6 +71,24 @@ void setup() {
 }
 
 void loop() {
+
+  if(id>0){
+    
+    char lightString[15];
+
+    shield.getLightLevel(lightString);
+
+    Serial.print(F("[    ] Light: "));
+    Serial.println(lightString);
+
+    Serial.println("############################ Preparing to send MEASUREMENTS #############################");  
+    iotPlatform.sendMeasurement("LightMeasurement", "LightMeasurement", "Light level (lux)", lightString, "lux");
+  
+    delay(5000);
+          
+  } else {
+    Serial.println("Something went wrong and an id isnt assigned, please check the number and try again");
+  }
 
 }
 

@@ -10,6 +10,7 @@ Connection4G conn(true,&shieldif);
 TelstraIoT iotPlatform(&conn,&shield);
 
 const char host[] = "XXXXX.iot.telstra.com";
+const char apn[] = "telstra.m2m";
 
 char id[9];
 char tenant[32];
@@ -21,6 +22,8 @@ void setup() {
   delay(500);
 
   Serial.println(F("[START] Starting Send All Measurments Script"));
+
+  conn.activatePDP(apn, "", "");  
   
   if(!shield.isShieldReady())
   {

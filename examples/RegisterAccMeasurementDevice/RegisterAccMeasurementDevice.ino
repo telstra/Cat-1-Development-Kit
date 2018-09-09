@@ -14,6 +14,8 @@ const char tenant[] = "XXXXX";
 const char username[] = "";
 const char password[] = "";
 const char appkey[] = ""; 
+const char apn[] = "telstra.m2m";
+
 
 TelstraIoT iotPlatform(host, tenant, username, password, appkey, &conn, &shield);
 
@@ -30,6 +32,7 @@ void setup() {
   shield.waitUntilShieldIsReady(); 
   Serial.println(F("[    ] ******* Shield ready *********"));
 
+  conn.activatePDP(apn, "", "");
 
   // Check if shield is connected to 4G network
   if(shield.isPDPContextActive()) {
