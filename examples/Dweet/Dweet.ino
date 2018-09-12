@@ -9,12 +9,15 @@ Connection4G conn(false,&shieldif);
 
 const char host[] = "dweet.io";
 String deviceName = "";
+const char apn[] = "telstra.m2m";
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting....");
   
   delay(500);
+
+  conn.activatePDP(apn, "", "");  
   
   if(!shield.isShieldReady())
   {
